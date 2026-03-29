@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title> diffusion google alerts</title>
+<title> Diffusion Google Alerts</title>
 
 <style>
 body {
@@ -13,7 +13,6 @@ body {
 
 h1 {
   text-align:center;
-  color:#333;
 }
 
 .container {
@@ -28,28 +27,13 @@ h1 {
   border-radius:10px;
   box-shadow:0 2px 8px rgba(0,0,0,0.1);
 }
-
-.card a {
-  color:#1a73e8;
-  text-decoration:none;
-}
-
-.category {
-  font-size:12px;
-  color:#666;
-}
-
-.date {
-  font-size:11px;
-  color:#999;
-}
 </style>
 </head>
 
 <body>
 
-<h1>diffusion google alerts</h1>
-<div class="container" id="content"></div>
+<h1>Diffusion Google Alerts</h1>
+<div id="content" class="container"></div>
 
 <script>
 const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQbd4NQ6HyK9A5fKtY5mvWCgCbWuexi156-Iy9FXFlmGqD3xY9ZrghGn1AijnV5AxN5oqviWu-fcyaj/pub?output=csv";
@@ -58,13 +42,16 @@ fetch(SHEET_URL)
   .then(res => res.text())
   .then(data => {
 
+    console.log(data); // DEBUG
+
     const rows = data.split("\n").slice(1);
     const container = document.getElementById("content");
 
-    rows.reverse().forEach(row => {
+    rows.forEach(row => {
 
-      // gestion CSV propre
-      const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+      if (!row) return;
+
+      const cols = row.split(",");
 
       if (cols.length < 4) return;
 
@@ -73,25 +60,23 @@ fetch(SHEET_URL)
       const lien = cols[2];
       const categorie = cols[3];
 
-      if (!lien || lien === "null") return;
+      // IMPORTANT : ne pas filtrer trop tôt
+      if (!lien) return;
 
       const div = document.createElement("div");
       div.className = "card";
 
       div.innerHTML = `
-        <strong>${sujet}</strong><br><br>
-        <a href="${lien}" target="_blank">🔗 Lire l'article</a><br><br>
-        <div class="category">🏷️ ${categorie}</div>
-        <div class="date">📅 ${date}</div>
+        <strong>${sujet}</strong><br>
+        <a href="${lien}" target="_blank">${lien}</a><br>
+        <small>${categorie}</small><br>
+        <small>${date}</small>
       `;
 
       container.appendChild(div);
     });
   })
-  .catch(err => {
-    document.body.innerHTML += "<p style='color:red'>Erreur chargement données</p>";
-    console.error(err);
-  });
+  .catch(err => console.error(err));
 </script>
 
 </body>
