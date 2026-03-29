@@ -5,27 +5,50 @@
 <title> Diffusion Google Alerts</title>
 
 <style>
-body {
+    body {
   font-family: Arial;
-  background:#f5f7fa;
-  padding:20px;
+  background: #f5f7fa;
+  padding: 20px;
 }
 
 h1 {
-  text-align:center;
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 .container {
-  max-width:900px;
-  margin:auto;
+  max-width: 900px;
+  margin: auto;
 }
 
+.title {
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.link {
+  margin: 8px 0;
+}
+
+.link a {
+  display: inline-block;
+  word-break: break-word;
+  color: #1a73e8;
+}
+
+.category {
+  font-size: 12px;
+  color: #666;
+}
 .card {
   background:white;
   padding:15px;
-  margin:10px 0;
+  margin:12px 0;
   border-radius:10px;
   box-shadow:0 2px 8px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 </style>
 </head>
@@ -47,34 +70,35 @@ fetch(SHEET_URL)
     const rows = data.split("\n").slice(1);
     const container = document.getElementById("content");
 
-    rows.forEach(row => {
+rows.forEach(row => {
 
-      if (!row) return;
+  if (!row) return;
 
-      const cols = row.split(",");
+  const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
 
-      if (cols.length < 4) return;
+  if (cols.length < 4) return;
 
-      const date = cols[0];
-      const sujet = cols[1];
-      const lien = cols[2];
-      const categorie = cols[3];
+  const sujet = cols[1].replace(/"/g, "").trim();
+  const lien = cols[2].replace(/"/g, "").trim();
+  const categorie = cols[3].replace(/"/g, "").trim();
 
-      // IMPORTANT : ne pas filtrer trop tôt
-      if (!lien) return;
+  if (!lien || !lien.startsWith("http")) return;
 
-      const div = document.createElement("div");
-      div.className = "card";
+  const div = document.createElement("div");
+  div.className = "card";
 
-      div.innerHTML = `
-        <strong>${sujet}</strong><br>
-        <a href="${lien}" target="_blank">${lien}</a><br>
-        <small>${categorie}</small><br>
-        <small>${date}</small>
-      `;
+  div.innerHTML = `
+    <div class="title">${sujet}</div>
 
-      container.appendChild(div);
-    });
+    <div class="link">
+      <a href="${lien}" target="_blank">🔗 Lire l'article</a>
+    </div>
+
+    <div class="category">🏷️ ${categorie}</div>
+  `;
+
+  container.appendChild(div);
+});
   })
   .catch(err => console.error(err));
 </script>
