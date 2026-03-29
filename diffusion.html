@@ -82,7 +82,12 @@ rows.forEach(row => {
   const lien = cols[2].replace(/"/g, "").trim();
   const categorie = cols[3].replace(/"/g, "").trim();
 
-  if (!lien || !lien.startsWith("http")) return;
+ if (
+  !lien ||
+  lien.includes("gstatic") ||
+  lien.includes("google") ||
+  lien.match(/\.(jpg|png|gif|webp)$/)
+) return;
 
   const div = document.createElement("div");
   div.className = "card";
