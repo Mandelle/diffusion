@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Diffusion google alerts</title>
+  <style>
+    body { font-family: Arial; padding: 20px; background:#f5f5f5;}
+    h1 { color:#333; }
+    .card {
+      background:white;
+      padding:15px;
+      margin-bottom:10px;
+      border-radius:10px;
+      box-shadow:0 2px 5px rgba(0,0,0,0.1);
+    }
+    .category {
+      color:#666;
+      font-size:12px;
+    }
+    a { color:#1a73e8; text-decoration:none; }
+  </style>
+</head>
+
+<body>
+
+<h1>Diffusion google alerts</h1>
+
+<a href="index.html">Voir présentation</a>
+
+<div id="content"></div>
+
+<script>
+const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQbd4NQ6HyK9A5fKtY5mvWCgCbWuexi156-Iy9FXFlmGqD3xY9ZrghGn1AijnV5AxN5oqviWu-fcyaj/pubhtml";
+
+fetch(SHEET_URL)
+  .then(res => res.text())
+  .then(data => {
+    const rows = data.split("\n").slice(1);
+    const container = document.getElementById("content");
+
+    rows.reverse().forEach(row => {
+      const cols = row.split(",");
+
+      if(cols.length < 4) return;
+
+      const date = cols[0];
+      const sujet = cols[1];
+      const lien = cols[2];
+      const categorie = cols[3];
+
+      const div = document.createElement("div");
+      div.className = "card";
+
+      div.innerHTML = `
+        <strong>${sujet}</strong><br>
+        <a href="${lien}" target="_blank">${lien}</a><br>
+        <div class="category">${categorie}</div>
+        <small>${date}</small>
+      `;
+
+      container.appendChild(div);
+    });
+  });
+</script>
+
+</body>
+</html>
