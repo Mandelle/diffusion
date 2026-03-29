@@ -1,65 +1,96 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Diffusion google alerts</title>
-  <style>
-    body { font-family: Arial; padding: 20px; background:#f5f5f5;}
-    h1 { color:#333; }
-    .card {
-      background:white;
-      padding:15px;
-      margin-bottom:10px;
-      border-radius:10px;
-      box-shadow:0 2px 5px rgba(0,0,0,0.1);
-    }
-    .category {
-      color:#666;
-      font-size:12px;
-    }
-    a { color:#1a73e8; text-decoration:none; }
-  </style>
+<meta charset="UTF-8">
+<title>📡 Veille Google Alerts</title>
+
+<style>
+body {
+  font-family: Arial;
+  background:#f5f7fa;
+  padding:20px;
+}
+
+h1 {
+  text-align:center;
+  color:#333;
+}
+
+.container {
+  max-width:900px;
+  margin:auto;
+}
+
+.card {
+  background:white;
+  padding:15px;
+  margin:10px 0;
+  border-radius:10px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+.card a {
+  color:#1a73e8;
+  text-decoration:none;
+}
+
+.category {
+  font-size:12px;
+  color:#666;
+}
+
+.date {
+  font-size:11px;
+  color:#999;
+}
+</style>
 </head>
 
 <body>
 
-<h1>Diffusion google alerts</h1>
-
-<a href="index.html">Voir présentation</a>
-
-<div id="content"></div>
+<h1>📡 Veille Google Alerts</h1>
+<div class="container" id="content"></div>
 
 <script>
-const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQbd4NQ6HyK9A5fKtY5mvWCgCbWuexi156-Iy9FXFlmGqD3xY9ZrghGn1AijnV5AxN5oqviWu-fcyaj/pubhtml";
+const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQbd4NQ6HyK9A5fKtY5mvWCgCbWuexi156-Iy9FXFlmGqD3xY9ZrghGn1AijnV5AxN5oqviWu-fcyaj/pub?output=csv";
 
 fetch(SHEET_URL)
   .then(res => res.text())
   .then(data => {
+
     const rows = data.split("\n").slice(1);
     const container = document.getElementById("content");
 
     rows.reverse().forEach(row => {
-      const cols = row.split(",");
 
-      if(cols.length < 4) return;
+      // gestion CSV propre
+      const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+
+      if (cols.length < 4) return;
 
       const date = cols[0];
       const sujet = cols[1];
       const lien = cols[2];
       const categorie = cols[3];
 
+      if (!lien || lien === "null") return;
+
       const div = document.createElement("div");
       div.className = "card";
 
       div.innerHTML = `
-        <strong>${sujet}</strong><br>
-        <a href="${lien}" target="_blank">${lien}</a><br>
-        <div class="category">${categorie}</div>
-        <small>${date}</small>
+        <strong>${sujet}</strong><br><br>
+        <a href="${lien}" target="_blank">🔗 Lire l'article</a><br><br>
+        <div class="category">🏷️ ${categorie}</div>
+        <div class="date">📅 ${date}</div>
       `;
 
       container.appendChild(div);
     });
+  })
+  .catch(err => {
+    document.body.innerHTML += "<p style='color:red'>Erreur chargement données</p>";
+    console.error(err);
   });
 </script>
 
